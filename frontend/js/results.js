@@ -1,46 +1,64 @@
 // frontend/js/results.js
 
-// ── Guard: redirect if no data ────────────────────────────────────────────
-const raw = sessionStorage.getItem('aitool_result');
-if (!raw) { window.location.href = '/'; }
-const data = JSON.parse(raw);
+let data = null;
+try {
+  const raw = sessionStorage.getItem('aitool_result');
+  if (raw) data = JSON.parse(raw);
+} catch(e) {
+  console.error('Parse error:', e);
+}
 
-// ── Category icons ────────────────────────────────────────────────────────
-const CAT_ICONS = {
-  presentation: '📊', image: '🎨', audio: '🎵', video: '🎬',
-  coding: '💻', research: '🔬', writing: '✍️', ai_tool_usage: '🤖',
-};
+if (!data || !data.prompt) {
+  window.location.href = '/';
+  throw new Error('no data - redirecting');
+}
 
 const TOOL_ICONS = {
-  'Gamma AI': '✨', 'Canva AI': '🎨', 'Beautiful.ai': '💎',
-  'Midjourney': '🖼️', 'Adobe Firefly': '🔥', 'DALL-E (ChatGPT)': '🤖',
-  'ChatGPT': '💬', 'Gemini': '♊', 'GitHub Copilot': '🐙',
-  'Runway ML': '🎬', 'Pictory': '📽️', 'Perplexity AI': '🔍',
-  'Suno AI': '🎵', 'Udio': '🎶', 'ElevenLabs': '🎤', 'Mubert': '🎼',
+  'Gamma AI':'✨','Canva AI':'🎨','Beautiful.ai':'💎',
+  'Midjourney':'🖼️','Adobe Firefly':'🔥','DALL-E (ChatGPT)':'🤖',
+  'ChatGPT':'💬','Gemini':'♊','GitHub Copilot':'🐙',
+  'Runway ML':'🎬','Pictory':'📽️','Perplexity AI':'🔍',
+  'Suno AI':'🎵','Udio':'🎶','ElevenLabs':'🎤','Mubert':'🎼'
 };
 
-// ── Populate header ───────────────────────────────────────────────────────
-document.getElementById('topicTitle').textContent  = data.topic;
-document.getElementById('catPill').textContent =
-  (CAT_ICONS[data.category] || '🤖') + '  ' + (data.category || '').replace(/_/g, ' ').toUpperCase();
+// CAT_ICONS is already defined in nav.js — use it from there
+const ICONS = {
+  presentation:'📊', image:'🎨', audio:'🎵', video:'🎬',
+  coding:'💻', research:'🔬', writing:'✍️', ai_tool_usage:'🤖'
+};
+
+// ── Header ─────────────────────────────────────────────────────────────────
+const topicTitleEl = document.getElementById('topicTitle');
+const catPillEl    = document.getElementById('catPill');
+if (topicTitleEl) topicTitleEl.textContent = data.topic || '';
+if (catPillEl) catPillEl.textContent =
+  (ICONS[data.category] || '🤖') + '  ' +
+  (data.category || '').replace(/_/g, ' ').toUpperCase();
 
 // ── General prompt ─────────────────────────────────────────────────────────
 const promptEl = document.getElementById('generalPrompt');
-promptEl.textContent = data.prompt;
+if (promptEl) {
+  const copyBtn = promptEl.querySelector('.copy-btn');
+  promptEl.textContent = data.prompt || '';
+  if (copyBtn) promptEl.appendChild(copyBtn);
+}
 
-// ── Tips ──────────────────────────────────────────────────────────────────
+// ── Tips ───────────────────────────────────────────────────────────────────
 const tipsEl = document.getElementById('tipsGrid');
-(data.tips || '').split('\n').filter(t => t.trim()).forEach((tip, i) => {
-  const clean = tip.replace(/^-\s*/, '').trim();
-  if (!clean) return;
-  tipsEl.innerHTML += `
-    <div class="tip-card card fu" style="animation-delay:${.06 * i}s">
-      <div class="tip-n">${i + 1}</div>
-      <div class="tip-text">${clean}</div>
-    </div>`;
-});
+if (tipsEl) {
+  const tips = (data.tips || '').split('\n').filter(t => t.trim());
+  tips.forEach((tip, i) => {
+    const clean = tip.replace(/^-\s*/, '').trim();
+    if (!clean) return;
+    const div = document.createElement('div');
+    div.className = 'tip-card card fu';
+    div.style.animationDelay = `${.06 * i}s`;
+    div.innerHTML = `<div class="tip-n">${i + 1}</div><div class="tip-text">${clean}</div>`;
+    tipsEl.appendChild(div);
+  });
+}
 
-// ── Tools ─────────────────────────────────────────────────────────────────
+// ── Tools ──────────────────────────────────────────────────────────────────
 const toolsEl = document.getElementById('toolsGrid');
 
 function availClass(a) {
@@ -50,51 +68,52 @@ function availClass(a) {
   return 'avail-paid';
 }
 
-(data.tools || []).forEach((tool, i) => {
-  const icon  = TOOL_ICONS[tool.name] || '🔧';
-  const steps = (tool.steps || []).map((s, si) => `
-    <div class="step">
-      <div class="step-n">${si + 1}</div>
-      <span>${s}</span>
-    </div>`).join('');
+if (toolsEl && data.tools && data.tools.length) {
+  data.tools.forEach((tool, i) => {
+    const icon  = TOOL_ICONS[tool.name] || '🔧';
+    const steps = (tool.steps || []).map((s, si) => `
+      <div class="step">
+        <div class="step-n">${si + 1}</div>
+        <span>${s}</span>
+      </div>`).join('');
 
-  const card = document.createElement('div');
-  card.className = 'tool-card card-glow fu';
-  card.style.animationDelay = `${.08 * i}s`;
-  card.innerHTML = `
-    <div class="tool-top">
-      <div class="tool-left">
-        <div class="tool-avatar">${icon}</div>
-        <div>
-          <div class="tool-name">${tool.name}</div>
-          <div class="tool-sub">${tool.best_for || ''}</div>
+    const card = document.createElement('div');
+    card.className = 'tool-card card fu';
+    card.style.animationDelay = `${.08 * i}s`;
+    card.innerHTML = `
+      <div class="tool-top">
+        <div class="tool-left">
+          <div class="tool-avatar">${icon}</div>
+          <div>
+            <div class="tool-name">${tool.name}</div>
+            <div class="tool-sub">${tool.best_for || ''}</div>
+          </div>
         </div>
+        <span class="avail ${availClass(tool.availability)}">${tool.availability || ''}</span>
       </div>
-      <span class="avail ${availClass(tool.availability)}">${tool.availability || ''}</span>
-    </div>
+      <div class="tprompt">
+        <div class="tprompt-label">✦ Optimized Prompt</div>
+        <button class="copy-btn" onclick="copyTool(this)">Copy</button>
+        <div class="tprompt-text">${tool.tool_prompt || ''}</div>
+      </div>
+      <div class="steps">${steps}</div>
+      <div class="tool-cta">
+        <a href="${tool.link}" target="_blank" rel="noopener" class="open-btn">
+          Open ${tool.name} ↗
+        </a>
+      </div>`;
+    toolsEl.appendChild(card);
+  });
+}
 
-    <div class="tprompt">
-      <div class="tprompt-label">✦ Optimized Prompt</div>
-      <button class="copy-btn" onclick="copyTool(this)">Copy</button>
-      <div class="tprompt-text">${tool.tool_prompt || ''}</div>
-    </div>
-
-    <div class="steps">${steps}</div>
-
-    <div class="tool-cta">
-      <a href="${tool.link}" target="_blank" rel="noopener" class="open-btn">
-        Open ${tool.name} ↗
-      </a>
-    </div>`;
-  toolsEl.appendChild(card);
-});
-
-// ── Copy helpers ──────────────────────────────────────────────────────────
+// ── Copy helpers ───────────────────────────────────────────────────────────
 function copyMain() {
-  navigator.clipboard.writeText(promptEl.textContent).then(() => {
+  navigator.clipboard.writeText(data.prompt || '').then(() => {
     const btn = document.getElementById('copyMain');
-    btn.textContent = 'Copied!'; btn.classList.add('ok');
-    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('ok'); }, 2000);
+    if (btn) { btn.textContent = 'Copied!'; btn.classList.add('ok'); }
+    setTimeout(() => {
+      if (btn) { btn.textContent = 'Copy'; btn.classList.remove('ok'); }
+    }, 2000);
   });
 }
 

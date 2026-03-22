@@ -1,13 +1,12 @@
 // frontend/js/index.js
 
-const topicEl   = document.getElementById('topic');
-const genBtn    = document.getElementById('genBtn');
-const secArea   = document.getElementById('secArea');
-const secGrid   = document.getElementById('secGrid');
-const ldSec     = document.getElementById('ldSec');
-const ldGen     = document.getElementById('ldGen');
-
-let debounce = null;
+const topicEl = document.getElementById('topic');
+const genBtn  = document.getElementById('genBtn');
+const secArea = document.getElementById('secArea');
+const secGrid = document.getElementById('secGrid');
+const ldSec   = document.getElementById('ldSec');
+const ldGen   = document.getElementById('ldGen');
+let debounce  = null;
 
 // ── Example chips ─────────────────────────────────────────────────────────
 document.querySelectorAll('[data-ex]').forEach(el => {
@@ -18,7 +17,7 @@ document.querySelectorAll('[data-ex]').forEach(el => {
   });
 });
 
-// ── Auto-fetch sections on type ───────────────────────────────────────────
+// ── Auto fetch sections ───────────────────────────────────────────────────
 topicEl.addEventListener('input', () => {
   clearTimeout(debounce);
   const v = topicEl.value.trim();
@@ -26,7 +25,6 @@ topicEl.addEventListener('input', () => {
   debounce = setTimeout(() => fetchSections(v), 600);
 });
 
-// ── Fetch sections from backend ───────────────────────────────────────────
 async function fetchSections(topic) {
   ldSec.classList.add('on');
   secArea.classList.remove('show');
@@ -38,14 +36,13 @@ async function fetchSections(topic) {
     });
     const d = await r.json();
     renderSections(d.sections || []);
-  } catch (e) {
-    console.error('Sections error:', e);
+  } catch(e) {
+    console.error('fetchSections error:', e);
   } finally {
     ldSec.classList.remove('on');
   }
 }
 
-// ── Render section chips ──────────────────────────────────────────────────
 function renderSections(sections) {
   if (!sections.length) return;
   secGrid.innerHTML = '';
@@ -67,7 +64,7 @@ genBtn.addEventListener('click', async () => {
   const topic = topicEl.value.trim();
   if (!topic) {
     topicEl.focus();
-    topicEl.style.borderColor = 'rgba(248,113,113,.6)';
+    topicEl.style.borderColor = 'rgba(220,38,38,.5)';
     setTimeout(() => topicEl.style.borderColor = '', 1500);
     return;
   }
@@ -78,6 +75,7 @@ genBtn.addEventListener('click', async () => {
 
   ldGen.classList.add('on');
   genBtn.disabled = true;
+  genBtn.textContent = 'Generating…';
 
   try {
     const r = await fetch('/generate', {
@@ -85,18 +83,55 @@ genBtn.addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic, selected_sections: selected })
     });
-    const data = await r.json();
-    if (data.error) { alert('Error: ' + data.error); return; }
 
-    // Pass data to results page via sessionStorage then navigate
-    sessionStorage.setItem('aitool_result', JSON.stringify({ ...data, topic }));
+    const data = await r.json();
+
+    if (data.error) {
+      alert('Error: ' + data.error);
+      return;
+    }
+
+    // Build the result object
+    const result = {
+      topic:    data.topic    || topic,
+      category: data.category || '',
+      prompt:   data.prompt   || '',
+      tips:     data.tips     || '',
+      tools:    data.tools    || []
+    };
+
+    // Clear old data first then set new
+    sessionStorage.removeItem('aitool_result');
+    sessionStorage.setItem('aitool_result', JSON.stringify(result));
+
+    // Verify it was saved
+    const check = sessionStorage.getItem('aitool_result');
+    if (!check) {
+      alert('Storage error. Please try again.');
+      return;
+    }
+
+    // Save to history if logged in (fire and forget)
+    fetch('/api/history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        topic:    result.topic,
+        category: result.category,
+        prompt:   result.prompt
+      })
+    }).catch(() => {});
+
+    // Navigate to results
     window.location.href = '/results';
-  } catch (e) {
+
+  } catch(e) {
+    console.error('Generate error:', e);
     alert('Network error. Please try again.');
-    console.error(e);
   } finally {
     ldGen.classList.remove('on');
     genBtn.disabled = false;
+    genBtn.textContent = '✦ Generate Prompt & Find AI Tools';
   }
 });
 

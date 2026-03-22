@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Login — AI Tool Navigator</title>
+  <link rel="stylesheet" href="/css/base.css"/>
+  <link rel="stylesheet" href="/css/auth.css"/>
+</head>
+<body>
+<div class="bg"></div>
+<div class="orb orb-1"></div><div class="orb orb-2"></div>
+<div style="position:relative;z-index:1;">
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="nav-icon">✦</div>
+      AI Tool Navigator
+      <span class="nav-badge">Beta</span>
+    </a>
+    <a href="/signup" class="nav-signup-btn">Sign Up Free</a>
+  </nav>
+
+  <div class="auth-wrap">
+    <div class="auth-card card fu">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">✦</div>
+        <div class="auth-logo-text">AI Tool Navigator</div>
+      </div>
+      <h1 class="auth-title">Welcome back</h1>
+      <p class="auth-sub">Sign in to access your prompt history</p>
+
+      <div class="error-banner" id="errBanner"></div>
+
+      <form class="auth-form" id="loginForm" onsubmit="return false;">
+
+        <!-- Username or Email -->
+        <div class="form-group">
+          <label class="form-label">Username or Email</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" class="input" id="login_id"
+              placeholder="Enter your username or email" required/>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="input" id="password"
+              placeholder="Enter your password" required/>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginBtn">
+          Sign In
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="/signup">Sign up free</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function doLogin(e) {
+  if (e) e.preventDefault();
+  const btn      = document.getElementById('loginBtn');
+  const err      = document.getElementById('errBanner');
+  const login_id = document.getElementById('login_id').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  err.classList.remove('show');
+
+  try {
+    const r = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login_id, password })
+    });
+    const d = await r.json();
+    if (d.success) {
+      window.location.href = '/';
+    } else {
+      err.textContent = d.error;
+      err.classList.add('show');
+    }
+  } catch(e) {
+    err.textContent = 'Network error. Try again.';
+    err.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+}
+document.getElementById('loginForm').addEventListener('submit', doLogin);
+</script>
+</body>
+</html>

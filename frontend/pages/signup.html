@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Sign Up — AI Tool Navigator</title>
+  <link rel="stylesheet" href="/css/base.css?v=2"/>
+  <link rel="stylesheet" href="/css/auth.css?v=2"/>
+</head>
+<body>
+<div class="bg"></div>
+<div class="orb orb-1"></div><div class="orb orb-2"></div>
+<div style="position:relative;z-index:1;">
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="nav-icon">✦</div>
+      AI Tool Navigator
+      <span class="nav-badge">Beta</span>
+    </a>
+    <a href="/login" class="nav-login-btn">Sign In</a>
+  </nav>
+
+  <div class="auth-wrap">
+    <div class="auth-card card fu">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">✦</div>
+        <div class="auth-logo-text">AI Tool Navigator</div>
+      </div>
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-sub">Start generating perfect AI prompts today</p>
+
+      <div class="error-banner" id="errBanner"></div>
+
+      <form class="auth-form" id="signupForm" onsubmit="return false;">
+
+        <!-- Name — required -->
+        <div class="form-group">
+          <label class="form-label">Full Name <span style="color:var(--rose)">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" class="input" id="username" placeholder="Your name" required/>
+          </div>
+        </div>
+
+        <!-- Email — optional -->
+        <div class="form-group">
+          <label class="form-label">
+            Email Address
+            <span style="font-size:.72rem;font-weight:500;color:var(--text-4);margin-left:6px;">(optional)</span>
+          </label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">📧</span>
+            <input type="email" class="input" id="email" placeholder="you@example.com (optional)"/>
+          </div>
+          <div style="font-size:.74rem;color:var(--text-4);margin-top:4px;">
+            Add email if you want to recover your account later
+          </div>
+        </div>
+
+        <!-- Password — required -->
+        <div class="form-group">
+          <label class="form-label">Password <span style="color:var(--rose)">*</span></label>
+          <div class="input-icon-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" class="input" id="password" placeholder="At least 6 characters" required/>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" id="signupBtn">
+          Create Account
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="/login">Sign in</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function doSignup(e) {
+  if (e) e.preventDefault();
+  const btn      = document.getElementById('signupBtn');
+  const err      = document.getElementById('errBanner');
+  const username = document.getElementById('username').value.trim();
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!username) {
+    err.textContent = 'Please enter your name.';
+    err.classList.add('show'); return;
+  }
+  if (password.length < 6) {
+    err.textContent = 'Password must be at least 6 characters.';
+    err.classList.add('show'); return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating account…';
+  err.classList.remove('show');
+
+  try {
+    const r = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password })
+    });
+    const d = await r.json();
+    if (d.success) {
+      window.location.href = '/';
+    } else {
+      err.textContent = d.error;
+      err.classList.add('show');
+    }
+  } catch(e) {
+    err.textContent = 'Network error. Try again.';
+    err.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Account';
+  }
+}
+document.getElementById('signupForm').addEventListener('submit', doSignup);
+</script>
+</body>
+</html>

@@ -1,49 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>AI Tool Navigator</title>
-  <link rel="stylesheet" href="/css/base.css" />
-  <link rel="stylesheet" href="/css/index.css" />
+  <link rel="stylesheet" href="/css/base.css?v=2"/>
+  <link rel="stylesheet" href="/css/index.css?v=2"/>
 </head>
 <body>
-
-<!-- Background -->
 <div class="bg"></div>
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
-<div class="orb orb-3"></div>
-
+<div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
 <div style="position:relative;z-index:1;">
-
-  <!-- Navbar -->
   <nav class="navbar">
     <div class="nav-brand">
       <div class="nav-icon">✦</div>
       AI Tool Navigator
       <span class="nav-badge">Beta</span>
     </div>
-    <div class="nav-live">
-      <span class="live-dot"></span>
-      Live
+    <div class="nav-right" id="navRight">
+      <div class="nav-live"><span class="live-dot"></span> Live</div>
     </div>
   </nav>
 
-  <!-- Hero -->
   <section class="hero">
-    <div class="hero-pill fu">
-      <span class="hero-pill-dot"></span>
-      Powered by Gemini AI
-    </div>
-    <h1 class="hero-h1 fu d1">
-      Your intelligent guide to
-      <span class="line2">AI tools &amp; perfect prompts</span>
-    </h1>
-    <p class="hero-p fu d2">
-      Describe what you want to create. Get an optimized prompt,
-      curated AI tool suggestions, and step-by-step guidance — instantly.
-    </p>
+    <div class="hero-pill fu"><span class="hero-pill-dot"></span>Powered by Gemini AI</div>
+    <h1 class="hero-h1 fu d1">Your intelligent guide to<span class="line2">AI tools &amp; perfect prompts</span></h1>
+    <p class="hero-p fu d2">Describe what you want to create. Get an optimized prompt, curated AI tool suggestions, and step-by-step guidance — instantly.</p>
     <div class="stats fu d3">
       <div class="stat"><span class="stat-ico">🛠️</span> 20+ AI Tools</div>
       <div class="stat"><span class="stat-ico">⚡</span> Instant Prompts</div>
@@ -52,43 +34,17 @@
     </div>
   </section>
 
-  <!-- Main layout -->
   <div class="layout fu d4">
-
-    <!-- Left: Input -->
     <div class="input-card card">
       <div class="field-label">What do you want to create?</div>
-
-      <textarea
-        id="topic"
-        class="textarea"
-        rows="4"
-        placeholder="e.g. PPT on Artificial Intelligence, write a blog on Python, create a logo for my startup…"
-      ></textarea>
-
-      <!-- Sections loader -->
-      <div class="loader" id="ldSec">
-        <div class="dots"><span></span><span></span><span></span></div>
-        Detecting sections…
-      </div>
-
-      <!-- Dynamic sections -->
+      <textarea id="topic" class="textarea" rows="5" placeholder="e.g. PPT on Artificial Intelligence, write a blog on Python, create a logo for my startup…"></textarea>
+      <div class="loader" id="ldSec"><div class="dots"><span></span><span></span><span></span></div> Detecting sections…</div>
       <div class="sec-area" id="secArea">
         <div class="sec-label">📌 Select sections to include:</div>
         <div class="sec-grid" id="secGrid"></div>
       </div>
-
-      <!-- Generate loader -->
-      <div class="loader" id="ldGen">
-        <div class="dots"><span></span><span></span><span></span></div>
-        Generating prompts &amp; finding tools…
-      </div>
-
-      <button class="btn-primary" id="genBtn">
-        ✦ Generate Prompt &amp; Find AI Tools
-      </button>
-
-      <!-- Examples -->
+      <div class="loader" id="ldGen"><div class="dots"><span></span><span></span><span></span></div> Generating prompts &amp; finding tools…</div>
+      <button class="btn-primary" id="genBtn">✦ Generate Prompt &amp; Find AI Tools</button>
       <div>
         <div class="ex-label">Try an example →</div>
         <div class="ex-row">
@@ -101,26 +57,10 @@
         </div>
       </div>
     </div>
-
-    <!-- Right: Preview -->
-    <div class="preview-card card">
-      <div class="preview-orb">🚀</div>
-      <div class="preview-title">Results open on<br>the next page</div>
-      <div class="preview-desc">
-        Enter your topic and click Generate. You'll be taken to a dedicated results page with your prompts and tool suggestions.
-      </div>
-      <ul class="feature-list">
-        <li>✦ &nbsp;AI-optimized prompt for your topic</li>
-        <li>🛠️ &nbsp;Best AI tools matched to your need</li>
-        <li>📋 &nbsp;Step-by-step guide for each tool</li>
-        <li>💡 &nbsp;Pro tips to improve results</li>
-        <li>📋 &nbsp;One-click copy for every prompt</li>
-      </ul>
-    </div>
-
   </div>
 </div>
-
-<script src="/js/index.js"></script>
+<div class="toast" id="toast"></div>
+<script src="/js/nav.js?v=2"></script>
+<script src="/js/index.js?v=2"></script>
 </body>
 </html>

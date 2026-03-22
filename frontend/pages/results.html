@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Results — AI Tool Navigator</title>
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/results.css" />
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div style="position:relative;z-index:1;">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-icon">✦</div>
+      AI Tool Navigator
+      <span class="nav-badge">Beta</span>
+    </div>
+    <a href="/" class="btn-ghost">← New Search</a>
+  </nav>
+
+  <!-- Header -->
+  <div class="rhead">
+    <div class="cat-pill fu" id="catPill"></div>
+    <h1 class="r-title fu d1">
+      Results for "<span class="hl" id="topicTitle"></span>"
+    </h1>
+  </div>
+
+  <!-- Content -->
+  <div class="rcontent">
+
+    <!-- General Prompt -->
+    <div class="prompt-card card fu d2">
+      <div class="eyebrow" style="margin-bottom:16px;">✦ Best Prompt for This Topic</div>
+      <div class="prompt-box" id="generalPrompt">
+        <button class="copy-btn" id="copyMain" onclick="copyMain()">Copy</button>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div>
+      <div class="eyebrow fu" style="margin-bottom:14px;">💡 Pro Tips</div>
+      <div class="tips-grid" id="tipsGrid"></div>
+    </div>
+
+    <!-- Tools -->
+    <div>
+      <div class="eyebrow fu" style="margin-bottom:16px;">🛠️ Recommended AI Tools</div>
+      <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/results.js"></script>
+</body>
+</html>
